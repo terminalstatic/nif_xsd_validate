@@ -1,4 +1,4 @@
-defmodule Nif.Store.Schema do  
+defmodule Schema.Store do  
     def start_link(init_map) do  
         Agent.start_link(fn -> 
                 init_map
