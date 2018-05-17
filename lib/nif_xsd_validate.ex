@@ -2,7 +2,8 @@ defmodule ValidateXsd do
     @on_load :load_nifs
   
     def load_nifs do
-      :erlang.load_nif(Path.join(:code.lib_dir(:nif_xsd_validate), "/priv/validateXsd"), 0) 
+      #:erlang.load_nif(Path.join(:code.lib_dir(:nif_xsd_validate), "/priv/validateXsd"), 0) 
+      :ok = :erlang.load_nif(:code.lib_dir(:nif_xsd_validate) ++ '/priv/validateXsd', 0)
     end
   
     def validate(_resource, _xml) do

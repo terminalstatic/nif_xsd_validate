@@ -7,7 +7,21 @@ defmodule NifXsdValidate.MixProject do
     [
       app: :nif_xsd_validate,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.4",
+      package: [
+        maintainers: [],
+        licenses: ["terminalstatic"],
+        links: %{"Github" => "https://github.com/terminalstatic/nif_xsd_validate"},
+        files: [
+          "mix.exs",
+          "Makefile",
+          "README.md",
+          "config",
+          "lib",
+          "priv/.gitkeep",
+          "c_source"
+        ]
+      ],
       compilers: [:validateXsd] ++ Mix.compilers,
       start_permanent: Mix.env() == :prod,
       deps: deps()
