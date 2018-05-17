@@ -27,5 +27,5 @@ end
 Init the Storage Agent in the application config or manually:
 ```elixir
 Schema.Store.start_link(%{schema: "url://to/schema"})
-ValidateXsd.validate(%{schema: "<xml></xml>"})
+ValidateXsd.validate(:schema, "<xml></xml>")
 ```
