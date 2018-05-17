@@ -5,10 +5,13 @@ CFLAGS=-fPIC -I$(ERLANG_PATH) -I/usr/local/include -I/usr/include -L/usr/local/l
 
 .PHONY: all clean
 priv/validateXsd.so: c_source/validateXsd.c c_source/vlibxml.h priv/vlibxml.o
+	mkdir -p priv
 	$(CC) $(CFLAGS) -shared -o $@ c_source/validateXsd.c priv/vlibxml.o $(shell pkg-config --libs libxml-2.0)
+	rm priv/vlibxml.o
 
 priv/vlibxml.o: c_source/vlibxml.c c_source/vlibxml.h
+	mkdir -p priv
 	$(CC) $(CFLAGS) -c -o $@ c_source/vlibxml.c 
 
 clean:
-	rm priv/*.so priv/*.o
+	rm priv/validateXsd.so
