@@ -1,7 +1,7 @@
 defmodule NifXsdValidate.MixProject do
   use Mix.Project
 
-  @version "0.0.2"
+  @version "0.0.3"
 
   def project do
     [
@@ -45,7 +45,13 @@ defmodule NifXsdValidate.MixProject do
 end
 defmodule Mix.Tasks.Compile.ValidateXsd do
   def run(_args) do
-    {result, _errcode} = System.cmd("make", ["priv/validateXsd.so"], stderr_to_stdout: true)
+    if match? {:win32, _}, :os.type do
+      IO.warn("Windows is not supported.")
+      exit(1)
+    else
+    {result, _errcode} = System.cmd("make", [], stderr_to_stdout: true)
     IO.binwrite(result)
+    end
+    :ok 
   end
 end

@@ -22,5 +22,7 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 nif_xsd_validate-*.tar
 
+/priv/libxml2
+
 *.o
 *.so
