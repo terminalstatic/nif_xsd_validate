@@ -1,6 +1,7 @@
 # NifXsdValidate
 
-An Elixir package for Xml Validation, based on libxml2.
+An elixir package for validating xml content against xsd, based on libxml2.
+It is basically meant to preload xsd schemata from given urls and use those throughout the lifetime of an application.
 
 ## Installation
 
@@ -21,16 +22,50 @@ end
 ```
 
 ## Usage
-Init the Storage Agent in the application config or manually.
-The validition is done against the schema identified by the key.
+Init the Storage Agent in the application module or manually.
+Schemata (Libxml2 xmlSchemaPtrs) are stored in a map and identified by a key.
 
 ```elixir
 NifXsd.Schema.start_link(%{someSchemaKey1: "url://to/schema1"})
 NifXsd.validate(NifXsd.Schema.get(:someSchemaKey1), "<xml></xml>")
-
-NifXsd.Schema.start_link(%{someSchemaKey2: "url://to/schema2"})
+```
+Supervisor configuration example:
+```elixir
+children = [
+supervisor(NifXsd.Schema,[%{someSchemaKey1: "url://to/schema1", someSchemaKey2: "url://to/schema2"])
+]
+```
+Validation works as expected:
+```elixir
+NifXsd.validate(NifXsd.Schema.get(:someSchemaKey1), "<xml></xml>")
 NifXsd.validate(NifXsd.Schema.get(:someSchemaKey2), "<xml></xml>")
 ```
+## Plug example
+It comes in quite handy when used in combination with [Plug|https://github.com/elixir-plug/plug], a quick example could look like this:
 
-
-
+```elixir
+defmodule ExamplePlug.XsdValidate do
+    import Plug.Conn
+    def init(default), do: default
+  
+    def call(conn, _) do
+        {:ok, body, _} = Plug.Conn.read_body(conn)
+        conn = assign(conn, :xml_body, body)
+        
+        case NifXsd.validate(NifXsd.Schema.get(:schema), body) do
+            {:ok, _} -> conn
+            {:error, reason} -> 
+            reason = 
+            "<Errors>" 
+            <> (reason
+            |>Enum.map(fn(x) -> "<Error>" <> x <> "</Error>" end)
+            |>Enum.join)
+            <>"</Errors>"
+            conn
+            |> put_resp_content_type("text/xml")
+            |> send_resp(400, reason)
+            |> halt
+        end
+    end
+end
+```
