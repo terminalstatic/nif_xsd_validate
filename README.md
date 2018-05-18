@@ -2,6 +2,7 @@
 
 An elixir package for validating xml content against xsd, based on libxml2.
 It is basically meant to preload xsd schemata from given urls and use those throughout the lifetime of an application.
+Right now the validation returns the status and a list of strings, this will most likely change to a more verbose structure in future versions.
 
 ## Installation
 
@@ -22,6 +23,7 @@ end
 ```
 
 ## Usage
+
 Init the Storage Agent in the application module or manually.
 Schemata (Libxml2 xmlSchemaPtrs) are stored in a map and identified by a key.
 
@@ -41,7 +43,7 @@ NifXsd.validate(NifXsd.Schema.get(:someSchemaKey1), "<xml></xml>")
 NifXsd.validate(NifXsd.Schema.get(:someSchemaKey2), "<xml></xml>")
 ```
 ## Plug example
-It comes in quite handy when used in combination with [Plug|https://github.com/elixir-plug/plug], a quick example could look like this:
+It comes in quite handy when used in combination with [Plug](https://github.com/elixir-plug/plug), a quick example could look like this:
 
 ```elixir
 defmodule ExamplePlug.XsdValidate do
@@ -49,11 +51,10 @@ defmodule ExamplePlug.XsdValidate do
     def init(default), do: default
   
     def call(conn, _) do
-        {:ok, body, _} = Plug.Conn.read_body(conn)
-        conn = assign(conn, :xml_body, body)
+        {:ok, body, _} = Plug.Conn.read_body(conn)    
         
         case NifXsd.validate(NifXsd.Schema.get(:schema), body) do
-            {:ok, _} -> conn
+            {:ok, _} -> assign(conn, :xml_body, body)
             {:error, reason} -> 
             reason = 
             "<Errors>" 
