@@ -2,7 +2,7 @@
 
 An elixir package for validating xml content against xsd, based on libxml2.
 It is basically meant to preload xsd schemata from given urls and use those throughout the lifetime of an application.
-This is quite an early version, right now the validation returns the status and a list of strings, this will most likely change to a more verbose structure in future versions.
+This is quite an early version, right now the validation returns the status and a list of strings, this might be subject to change in the future.
 
 ## Installation
 
