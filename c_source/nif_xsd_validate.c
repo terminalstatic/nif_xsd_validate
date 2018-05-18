@@ -176,6 +176,5 @@ static void chopPoint(char *str) {
 			str[strlen(str) - 1] = '\0';
 }
 
-//ERL_NIF_INIT(Elixir.ValidateXsd, funcs, &load, &reload, &upgrade, &unload)
-ERL_NIF_INIT(Elixir.ValidateXsd, funcs, &load, &reload, &upgrade, &unload)
+ERL_NIF_INIT(Elixir.NifXsd, funcs, &load, &reload, &upgrade, &unload)
 

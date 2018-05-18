@@ -1,7 +1,7 @@
 defmodule NifXsdValidate.MixProject do
   use Mix.Project
 
-  @version "0.0.3"
+  @version "0.0.4"
 
   def project do
     [
@@ -22,7 +22,7 @@ defmodule NifXsdValidate.MixProject do
           "c_source"
         ]
       ],
-      compilers: [:validateXsd] ++ Mix.compilers,
+      compilers: [:nifXsdValidate] ++ Mix.compilers,
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -43,14 +43,16 @@ defmodule NifXsdValidate.MixProject do
     ]
   end
 end
-defmodule Mix.Tasks.Compile.ValidateXsd do
+defmodule Mix.Tasks.Compile.NifXsdValidate do
   def run(_args) do
     if match? {:win32, _}, :os.type do
       IO.warn("Windows is not supported.")
       exit(1)
     else
-    {result, _errcode} = System.cmd("make", [], stderr_to_stdout: true)
-    IO.binwrite(result)
+    {_, errcode} = System.cmd("make", [], into: IO.stream(:stdio, :line))
+      if errcode != 0 do
+        Mix.raise("Mix task failed")
+      end
     end
     :ok 
   end

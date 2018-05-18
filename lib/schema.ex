@@ -1,9 +1,9 @@
-defmodule Schema.Store do  
+defmodule NifXsd.Schema do  
     def start_link(init_map) do  
         Agent.start_link(fn -> 
                 init_map
                 |> Enum.map(fn {k, v} -> 
-                    {:ok, schema} = ValidateXsd.load_schema(v)
+                    {:ok, schema} = NifXsd.load_schema(v)
                     {k,schema}
                 end)
                 |> Enum.into(%{})
