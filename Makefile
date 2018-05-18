@@ -14,9 +14,9 @@ endif
 
 .PHONY: all clean
 
-priv/nif_xsd_validate.so: c_source/nif_xsd_validate.c c_source/vlibxml.h priv/vlibxml.o priv/libxml2/lib/libxml2.a
+priv/nif_xsd_validate.so: c_source/nif_xsd_validate.c priv/libxml2/lib/libxml2.a c_source/vlibxml.h priv/vlibxml.o
 	mkdir -p priv
-	$(CC) $(CFLAGS) -shared $(LDFLAGS) -o $@ c_source/nif_xsd_validate.c priv/vlibxml.o priv/libxml2/lib/libxml2.a $(shell pkg-config --libs libxml-2.0)
+	$(CC) $(CFLAGS) -shared $(LDFLAGS) -o $@ c_source/nif_xsd_validate.c priv/libxml2/lib/libxml2.a priv/vlibxml.o $(shell pkg-config --libs libxml-2.0)
 	@rm -f priv/vlibxml.o
 
 priv/vlibxml.o: c_source/vlibxml.c c_source/vlibxml.h

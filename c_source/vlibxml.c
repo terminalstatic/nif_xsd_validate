@@ -1,6 +1,6 @@
 #include <string.h>
 #include <errno.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include "vlibxml.h"
 
