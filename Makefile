@@ -4,12 +4,8 @@ ERLANG_PATH=$(shell erl -eval 'io:format("~s", [lists:concat([code:root_dir(), "
 CFLAGS=-fPIC -I$(ERLANG_PATH) -Ipriv/libxml2/include/libxml2 -Lpriv/libxml2/lib -std=c99 -O2 -Wall -pedantic -g  $(shell pkg-config --cflags libxml-2.0)
 CURL = curl -LO
 
-ifneq ($(OS),Windows_NT)
-	CFLAGS += -fPIC
-
-	ifeq ($(shell uname),Darwin)
+ifeq ($(shell uname),Darwin)
 		LDFLAGS += -dynamiclib -undefined dynamic_lookup
-	endif
 endif
 
 .PHONY: all clean
