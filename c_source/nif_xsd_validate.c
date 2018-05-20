@@ -140,6 +140,7 @@ static ErlNifFunc funcs[] = {
 
 static int
 load(ErlNifEnv *env, void **priv, ERL_NIF_TERM info) {
+	cleanup();
 	init();
 	int flags = ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER;
 	XMLSCHEMA_TYPE = enif_open_resource_type(env, NULL, "xsd_schema_resource", freeSchema, flags, NULL);
@@ -149,20 +150,17 @@ load(ErlNifEnv *env, void **priv, ERL_NIF_TERM info) {
 
 static void
 unload(ErlNifEnv *env, void *priv) {
-	cleanup();
 	printf("Nif info: unload");
 }
 
 static int
 reload(ErlNifEnv *env, void **priv, ERL_NIF_TERM info) {
-	unload(env,priv);
 	printf("Nif info: reload\n");
 	return(load(env, priv, info));
 }
 
 static int
 upgrade(ErlNifEnv *env, void **priv, void **old_priv, ERL_NIF_TERM info) {
-	unload(env,priv);
 	printf("Nif info: upgrade\n");
 	return load(env, priv, info);
 }
