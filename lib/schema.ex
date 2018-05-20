@@ -1,4 +1,16 @@
 defmodule NifXsd.Schema do  
+
+    @doc """
+    Starts the agent for the schemata map with init_map.
+    ## Example
+        NifXsd.Schema.start_link(%{someSchemaKey1: "url://to/schema1", someSchemaKey2: "url://to/schema2"})
+    In an application file:
+        supervisor(NifXsd.Schema,[%{someSchemaKey1: "url://to/schema1", someSchemaKey2: "url://to/schema2"}])
+    """ 
+    def start_link() do
+        Agent.start_link(fn -> %{} end, name: __MODULE__)
+    end
+
     def start_link(init_map) do  
         Agent.start_link(fn -> 
                 init_map
@@ -9,12 +21,30 @@ defmodule NifXsd.Schema do
                 |> Enum.into(%{})
             end, name: __MODULE__)  
     end
-    
+
+    @doc """
+    Puts an entry into the schema map.
+    ## Example
+        NifXsd.Schema.put(:newSchemaKey, "url://to/newSchema")
+    """     
     def put(key, value) do  
-        Agent.update(__MODULE__, &Map.put(&1, key, value))  
+        {:ok, schema} = NifXsd.load_schema(value)
+        Agent.update(__MODULE__, &Map.put(&1, key, schema))  
     end
-    
+
+    @doc """
+    Returns a resource(xmlSchemaPtr) by its key, see `NifXsd.validate/2`.
+    """     
     def get(key) do  
         Agent.get(__MODULE__, &Map.get(&1, key))  
     end  
+
+    @doc """
+    Deletes an entry from the schema map.
+    ## Example
+        NifXsd.Schema.delete(:schemaKey)
+    """     
+    def delete(key) do
+        Agent.update(__MODULE__, &Map.delete(&1, key))
+    end
 end  

@@ -34,7 +34,7 @@ NifXsd.validate(NifXsd.Schema.get(:someSchemaKey1), "<xml></xml>")
 Supervisor configuration example:
 ```elixir
 children = [
-supervisor(NifXsd.Schema,[%{someSchemaKey1: "url://to/schema1", someSchemaKey2: "url://to/schema2"])
+supervisor(NifXsd.Schema,[%{someSchemaKey1: "url://to/schema1", someSchemaKey2: "url://to/schema2"]})
 ]
 ```
 Validation works as expected:

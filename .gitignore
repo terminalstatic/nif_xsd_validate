@@ -27,3 +27,4 @@ nif_xsd_validate-*.tar
 *.o
 *.so
 .vscode
+mix.lock
