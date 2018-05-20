@@ -80,6 +80,7 @@ validate(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 	} else {
 		returnTerm = enif_make_atom(env, "ok");
 	}
+	freeErrArray(errs);
 	
 	return returnTerm;
 }
