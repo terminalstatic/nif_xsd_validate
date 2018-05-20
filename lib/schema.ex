@@ -1,16 +1,19 @@
 defmodule NifXsd.Schema do  
 
     @doc """
-    Starts the agent for the schemata map with init_map.
-    ## Example
-        NifXsd.Schema.start_link(%{someSchemaKey1: "url://to/schema1", someSchemaKey2: "url://to/schema2"})
-    In an application file:
-        supervisor(NifXsd.Schema,[%{someSchemaKey1: "url://to/schema1", someSchemaKey2: "url://to/schema2"}])
+    Starts the agent for the schema map with an empty map.
     """ 
     def start_link() do
         Agent.start_link(fn -> %{} end, name: __MODULE__)
     end
 
+    @doc """
+    Starts the agent for the schema map with init_map.
+    ## Example
+        NifXsd.Schema.start_link(%{someSchemaKey1: "url://to/schema1", someSchemaKey2: "url://to/schema2"})
+    In an application file:
+        supervisor(NifXsd.Schema,[%{someSchemaKey1: "url://to/schema1", someSchemaKey2: "url://to/schema2"}])
+    """ 
     def start_link(init_map) do  
         Agent.start_link(fn -> 
                 init_map
@@ -28,8 +31,13 @@ defmodule NifXsd.Schema do
         NifXsd.Schema.put(:newSchemaKey, "url://to/newSchema")
     """     
     def put(key, value) do  
-        {:ok, schema} = NifXsd.load_schema(value)
-        Agent.update(__MODULE__, &Map.put(&1, key, schema))  
+        case NifXsd.load_schema(value) do 
+            {:ok, schema} -> 
+                Agent.update(__MODULE__, &Map.put(&1, key, schema))
+                {:ok,""}
+            {:error, reason} ->
+                {:error, reason}
+        end  
     end
 
     @doc """
