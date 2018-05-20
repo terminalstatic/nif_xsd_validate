@@ -15,15 +15,14 @@ priv/nif_xsd_validate.so: c_source/nif_xsd_validate.c priv/libxml2/lib/libxml2.a
 
 priv/vlibxml.o: c_source/vlibxml.c c_source/vlibxml.h
 	mkdir -p priv
-	$(CC) $(CFLAGS) -c -o $@ c_source/vlibxml.c 
+	$(CC) $(CFLAGS) -c -o $@ $< 
 
 priv/libxml2/lib/libxml2.a:
 	rm -rf c_build
 	mkdir -p c_build
-	cd c_build \
-		&& curl -L ftp://xmlsoft.org/libxml2/LATEST_LIBXML2 -o LATEST_LIBXML2.tar.gz \
-		&& tar -xf LATEST_LIBXML2.tar.gz \
-		&& cd $(shell find c_build/ -maxdepth 1 -type d -name 'libxml2*' -printf "%f") \
+	curl -L ftp://xmlsoft.org/libxml2/LATEST_LIBXML2 -o ./c_build/LATEST_LIBXML2.tar.gz 
+	tar -xf c_build/LATEST_LIBXML2.tar.gz -C ./c_build/
+	cd ./c_build/libxml2* \
 		&& ./configure --prefix=`pwd`/../../priv/libxml2 --with-pic --without-python --with-threads --with-history \
 		&& make \
 		&& make install
