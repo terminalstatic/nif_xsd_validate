@@ -3,6 +3,7 @@
 An elixir package for validating xml content against xsd, based on libxml2.
 It is basically meant to preload xsd schemata from given urls and use those throughout the lifetime of an application.
 This is quite an early version, right now the validation returns the status and a list of strings, this might be subject to change in the future.
+Generally changes to the api might still happen.
 
 ## Installation
 
@@ -54,7 +55,7 @@ defmodule ExamplePlug.XsdValidate do
         {:ok, body, _} = Plug.Conn.read_body(conn)    
         
         case NifXsd.validate(NifXsd.Schema.get(:schema), body) do
-            {:ok, _} -> assign(conn, :xml_body, body)
+            :ok -> assign(conn, :xml_body, body)
             {:error, reason} -> 
             reason = 
             "<Errors>" 

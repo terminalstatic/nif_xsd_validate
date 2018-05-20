@@ -29,12 +29,13 @@ defmodule NifXsd.Schema do
     Puts an entry into the schema map.
     ## Example
         NifXsd.Schema.put(:newSchemaKey, "url://to/newSchema")
-    """     
+    """
+    @spec put(atom(), String.t) :: :ok|{:error, String.t}
     def put(key, value) do  
         case NifXsd.load_schema(value) do 
             {:ok, schema} -> 
                 Agent.update(__MODULE__, &Map.put(&1, key, schema))
-                {:ok,""}
+                :ok
             {:error, reason} ->
                 {:error, reason}
         end  
@@ -42,7 +43,8 @@ defmodule NifXsd.Schema do
 
     @doc """
     Returns a resource(xmlSchemaPtr) by its key, see `NifXsd.validate/2`.
-    """     
+    """
+    @spec get(atom()) :: any()    
     def get(key) do  
         Agent.get(__MODULE__, &Map.get(&1, key))  
     end  
@@ -52,6 +54,7 @@ defmodule NifXsd.Schema do
     ## Example
         NifXsd.Schema.delete(:schemaKey)
     """     
+    @spec delete(atom()) :: :ok
     def delete(key) do
         Agent.update(__MODULE__, &Map.delete(&1, key))
     end

@@ -71,10 +71,17 @@ validate(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 		memcpy(erlErr.data, errs->data[i].message, lSize);
 		erlErrs[i] = enif_make_binary(env, &erlErr);
 	}
-	ERL_NIF_TERM returnArr = errs->len>0 ? enif_make_list_from_array(env, erlErrs,errs->len) : enif_make_list(env, 0);
-	ERL_NIF_TERM returnState = errs->len>0 ? enif_make_atom(env, "error") : enif_make_atom(env, "ok");
 	
-	return enif_make_tuple2(env, returnState, returnArr);
+	ERL_NIF_TERM returnTerm;
+	if (errs->len>0) {
+		ERL_NIF_TERM returnArr = enif_make_list_from_array(env, erlErrs,errs->len);
+		ERL_NIF_TERM returnState = enif_make_atom(env, "error");
+		returnTerm = enif_make_tuple2(env, returnState, returnArr);
+	} else {
+		returnTerm = enif_make_atom(env, "ok");
+	}
+	
+	return returnTerm;
 }
 
 static ERL_NIF_TERM
@@ -149,7 +156,7 @@ load(ErlNifEnv *env, void **priv, ERL_NIF_TERM info) {
 
 static void
 unload(ErlNifEnv *env, void *priv) {
-	printf("Nif info: unload");
+	printf("Nif info: unload\n");
 }
 
 static int

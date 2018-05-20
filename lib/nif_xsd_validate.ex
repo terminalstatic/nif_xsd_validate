@@ -1,9 +1,13 @@
 defmodule NifXsd do
-    @on_load :load_nifs
+  require Logger
+  @on_load :load_nifs
   
     @doc false
     def load_nifs do
-      :ok = :erlang.load_nif(Path.join(:code.priv_dir(:nif_xsd_validate), "nif_xsd_validate"), 0) 
+      case :erlang.load_nif(Path.join(:code.priv_dir(:nif_xsd_validate), "nif_xsd_validate"), 0) do
+        {:error, {_, error_text}} -> Logger.error "NIF load_nif failed: #{error_text}"
+        :ok -> Logger.info "NIF load_nif successful"
+      end
     end
 
     @doc """
@@ -12,6 +16,7 @@ defmodule NifXsd do
     ## Example
         NifXsd.validate(NifXsd.Schema.get(:someSchemaKey1), "<xml></xml>")
     """ 
+    @spec validate(any(), String.t) :: :ok|{:error, [String.t]}
     def validate(_resource, _xml) do
       raise "NIF validate/2 not implemented, load_nif probably failed"
     end
