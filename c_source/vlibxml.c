@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "vlibxml.h"
 
-void freeErrArray(errArray *errArr) {
+void vFreeErrArray(vErrArray *errArr) {
 	for (int i=0;i<errArr->len;i++) {
 		free(errArr->data[i].message);
 		free(errArr->data[i].node);
@@ -13,21 +13,21 @@ void freeErrArray(errArray *errArr) {
 	free(errArr);
 }
 static void noOutputCallback(void *ctx, const char *message, ...) {}
-void init() {
+void vLibxmlInit() {
 	xmlInitParser();
 }
-void cleanup() {
+void vLibxmlCleanup() {
 	xmlSchemaCleanupTypes();
 	xmlCleanupParser();
 }
 static void genErrorCallback(void *ctx, const char *message, ...) {
-	struct errCtx *ectx = ctx;
-	char *newLine = malloc(GO_ERR_INIT);
+	struct vErrCtx *ectx = ctx;
+	char *newLine = malloc(P_ERR_INIT);
 	va_list varArgs;
 	va_start(varArgs, message);
 	int oldLen = strlen(ectx->errBuf) + 1;
-	int lineLen = 1 + vsnprintf(newLine, GO_ERR_INIT, message, varArgs);
-	if (lineLen  > GO_ERR_INIT) {
+	int lineLen = 1 + vsnprintf(newLine, P_ERR_INIT, message, varArgs);
+	if (lineLen  > P_ERR_INIT) {
 		va_end(varArgs);
 		va_start(varArgs, message);
 		free(newLine);
@@ -45,23 +45,23 @@ static void genErrorCallback(void *ctx, const char *message, ...) {
 	ectx->errBuf = tmp;
 }
 static void simpleStructErrorCallback(void *ctx, xmlErrorPtr p) {
-	errArray *sErrArr = ctx;
-	struct simpleXmlError sErr;
-	sErr.message = calloc(GO_ERR_INIT, sizeof(char));
-	sErr.node = calloc(GO_ERR_INIT, sizeof(char));
+	vErrArray *sErrArr = ctx;
+	struct vSimpleXmlError sErr;
+	sErr.message = calloc(P_ERR_INIT, sizeof(char));
+	sErr.node = calloc(P_ERR_INIT, sizeof(char));
 	sErr.type = VALIDATION_ERROR;
 	sErr.code = p->code;
 	sErr.level = p->level;
 	sErr.line = p->line;
-	int cpyLen = 1 + snprintf(sErr.message, GO_ERR_INIT, "%s", p->message);
-	if (cpyLen > GO_ERR_INIT) {
+	int cpyLen = 1 + snprintf(sErr.message, P_ERR_INIT, "%s", p->message);
+	if (cpyLen > P_ERR_INIT) {
 		free(sErr.message);
 		sErr.message = malloc(cpyLen);
 		snprintf(sErr.message, cpyLen, "%s", p->message);
 	}
 	if (p->node !=NULL) {
-		cpyLen = 1 + snprintf(sErr.node, GO_ERR_INIT, "%s", (((xmlNodePtr) p->node)->name));
-		if (cpyLen > GO_ERR_INIT) {
+		cpyLen = 1 + snprintf(sErr.node, P_ERR_INIT, "%s", (((xmlNodePtr) p->node)->name));
+		if (cpyLen > P_ERR_INIT) {
 			free(sErr.node);
 			sErr.node= malloc(cpyLen);
 			snprintf(sErr.node, cpyLen, "%s", (((xmlNodePtr) p->node)->name));
@@ -69,7 +69,7 @@ static void simpleStructErrorCallback(void *ctx, xmlErrorPtr p) {
 	}
 	if (sErrArr->len >= sErrArr->cap) {
 		sErrArr->cap = sErrArr->cap * 2;
-		struct simpleXmlError *tmp = calloc(sErrArr->cap, sizeof(*tmp));
+		struct vSimpleXmlError *tmp = calloc(sErrArr->cap, sizeof(*tmp));
 		memcpy(tmp, sErrArr->data, sErrArr->len * sizeof(*tmp));
 		free(sErrArr->data);
 		sErrArr->data = tmp;
@@ -77,13 +77,13 @@ static void simpleStructErrorCallback(void *ctx, xmlErrorPtr p) {
 	sErrArr->data[sErrArr->len] = sErr;
 	sErrArr->len++;
 }
-struct xsdParserResult cParseUrlSchema(const char *url, const short int options) {
+struct vXsdParserResult vParseUrlSchema(const char *url, const short int options) {
 	xmlLineNumbersDefault(1);
 	bool err = false;
-	struct xsdParserResult parserResult;
+	struct vXsdParserResult parserResult;
 	char *errBuf=NULL;
-	struct errCtx ectx;
-	ectx.errBuf=calloc(GO_ERR_INIT, sizeof(char));
+	struct vErrCtx ectx;
+	ectx.errBuf=calloc(P_ERR_INIT, sizeof(char));
 	xmlSchemaPtr schema = NULL;
 	xmlSchemaParserCtxtPtr schemaParserCtxt = NULL;
 	schemaParserCtxt = xmlSchemaNewParserCtxt(url);
@@ -118,16 +118,16 @@ struct xsdParserResult cParseUrlSchema(const char *url, const short int options)
 	errno = err ? -1 : 0;
 	return parserResult;
 }
-static struct xmlParserResult cParseDoc(const void *goXmlSource, const int goXmlSourceLen, const short int options) {
+static struct vXmlParserResult vParseDoc(const void *xmlSource, const int xmlSourceLen, const short int options) {
 	xmlLineNumbersDefault(1);
 	bool err = false;
-	struct xmlParserResult parserResult;
+	struct vXmlParserResult parserResult;
 	char *errBuf=NULL;
-	struct errCtx ectx;
-	ectx.errBuf=calloc(GO_ERR_INIT, sizeof(char));;
+	struct vErrCtx ectx;
+	ectx.errBuf=calloc(P_ERR_INIT, sizeof(char));;
 	xmlDocPtr doc=NULL;
 	xmlParserCtxtPtr xmlParserCtxt=NULL;
-	if (goXmlSourceLen == 0) {
+	if (xmlSourceLen == 0) {
 		err = true;
 		if (options & P_ERR_VERBOSE) {
 			strcpy(ectx.errBuf, "parser error : Document is empty");
@@ -147,7 +147,7 @@ static struct xmlParserResult cParseDoc(const void *goXmlSource, const int goXml
 			} else {
 				xmlSetGenericErrorFunc(NULL, noOutputCallback);
 			}
-			doc = xmlParseMemory(goXmlSource, goXmlSourceLen);
+			doc = xmlParseMemory(xmlSource, xmlSourceLen);
 			xmlFreeParserCtxt(xmlParserCtxt);
 			if (doc == NULL) {
 				err = true;
@@ -170,15 +170,15 @@ static struct xmlParserResult cParseDoc(const void *goXmlSource, const int goXml
 	errno = err ? -1 : 0;
 	return parserResult;
 }
-static errArray *cValidate(const xmlDocPtr doc, const xmlSchemaPtr schema) {
+static vErrArray *vValidate(const xmlDocPtr doc, const xmlSchemaPtr schema) {
 	xmlLineNumbersDefault(1);
-	errArray *errArr = malloc(sizeof(*errArr));
-	errArr->data = calloc(2, sizeof(struct simpleXmlError));
+	vErrArray *errArr = malloc(sizeof(*errArr));
+	errArr->data = calloc(2, sizeof(*errArr->data));
 	errArr->len=0;
 	errArr->cap=2;
-	struct simpleXmlError simpleError;
-	simpleError.message = calloc(GO_ERR_INIT, sizeof(char));
-	simpleError.node = calloc(GO_ERR_INIT, sizeof(char));
+	struct vSimpleXmlError simpleError;
+	simpleError.message = calloc(P_ERR_INIT, sizeof(char));
+	simpleError.node = calloc(P_ERR_INIT, sizeof(char));
 	if (schema == NULL) {
 		simpleError.type = LIBXML2_ERROR;
 		strcpy(simpleError.message, "Xsd schema null pointer");
@@ -221,16 +221,16 @@ static errArray *cValidate(const xmlDocPtr doc, const xmlSchemaPtr schema) {
 	errno = errArr->len == NO_ERROR ? 0 : -1;
 	return errArr;
 }
-errArray *cValidateBuf(const void *goXmlSource, const int goXmlSourceLen, const short int xmlParserOptions, const xmlSchemaPtr schema) {
+vErrArray *vValidateBuf(const void *xmlSource, const int xmlSourceLen, const short int xmlParserOptions, const xmlSchemaPtr schema) {
 	xmlLineNumbersDefault(1);
-	errArray *errArr = malloc(sizeof(*errArr));
-	errArr->data = calloc(2, sizeof(struct simpleXmlError));
+	vErrArray *errArr = malloc(sizeof(*errArr));
+	errArr->data = calloc(2, sizeof(*errArr->data));
 	errArr->len=0;
 	errArr->cap=2;
-	struct simpleXmlError simpleError;
-	simpleError.message = calloc(GO_ERR_INIT, sizeof(char));
-	simpleError.node = calloc(GO_ERR_INIT, sizeof(char));
-	struct xmlParserResult parserResult = cParseDoc(goXmlSource, goXmlSourceLen, xmlParserOptions);
+	struct vSimpleXmlError simpleError;
+	simpleError.message = calloc(P_ERR_INIT, sizeof(char));
+	simpleError.node = calloc(P_ERR_INIT, sizeof(char));
+	struct vXmlParserResult parserResult = vParseDoc(xmlSource, xmlSourceLen, xmlParserOptions);
 	if (schema == NULL) {
 		simpleError.type = LIBXML2_ERROR;
 		strcpy(simpleError.message, "Xsd schema null pointer");
@@ -250,7 +250,7 @@ errArray *cValidateBuf(const void *goXmlSource, const int goXmlSourceLen, const 
 		free(simpleError.message);
 		free(errArr->data);
 		free(errArr);
-		errArr = cValidate(parserResult.docPtr, schema);
+		errArr = vValidate(parserResult.docPtr, schema);
 		xmlFreeDoc(parserResult.docPtr);
 	}
 	free(parserResult.errorStr);

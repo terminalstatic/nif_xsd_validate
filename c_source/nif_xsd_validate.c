@@ -29,38 +29,10 @@ validate(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 	enif_release_binary(&xml);
 	xmlStr[xml.size] = '\0';
 	
-	errArray *errs = cValidateBuf(xmlStr,xmlSize, P_ERR_VERBOSE, *schemaRes);
+	vErrArray *errs = vValidateBuf(xmlStr,xmlSize, P_ERR_VERBOSE, *schemaRes);
 	free(xmlStr);
 
-	// Code for String result
-	// ERL_NIF_TERM result;
-	// int rsize = GO_ERR_INIT;
-	// char *errMsg = calloc(rsize, sizeof(char));
-	// for (int i=0;i<errs->len;i++) {
-	// 	int tlen = strlen(errMsg) + strlen(errs->data[i].message) + 1;
-	// 	if (tlen > rsize) {
-	// 		char *tmp = malloc(rsize + tlen * 2);
-	// 		memcpy(tmp, errMsg, strlen(errMsg) + 1);
-	// 		free(errMsg);				
-	// 		errMsg = tmp;
-	// 	} 
-	// 	strcat(errMsg, errs->data[i].message);				
-	// }
-
-	// freeErrArray(errs);
-	// chopCRLF(errMsg);
-	// chopPoint(errMsg);
-	// size_t size = strlen(errMsg);
-
-	// ErlNifBinary errStr;
-	// enif_alloc_binary(size, &errStr);
-	// memcpy(errStr.data, errMsg, size);		
-	// free(errMsg);
-
-	// result = enif_make_tuple2(env, size > 0 ? enif_make_atom(env, "error") : enif_make_atom(env, "ok"), enif_make_binary(env, &errStr));
-	// return result;
-
-	// Code for array result
+	// Array result
 	ERL_NIF_TERM erlErrs[errs->len];
 	for (int i=0;i<errs->len;i++) {
 		chopCRLF(errs->data[i].message);
@@ -80,7 +52,7 @@ validate(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 	} else {
 		returnTerm = enif_make_atom(env, "ok");
 	}
-	freeErrArray(errs);
+	vFreeErrArray(errs);
 	
 	return returnTerm;
 }
@@ -100,7 +72,7 @@ loadSchema(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 	enif_release_binary(&erlPath);
 	path[erlPath.size] = '\0';
 	
-	struct xsdParserResult xsdres = cParseUrlSchema(path, P_ERR_VERBOSE);
+	struct vXsdParserResult xsdres = vParseUrlSchema(path, P_ERR_VERBOSE);
 	free(path);
 	if (xsdres.schemaPtr==NULL) {
 		chopCRLF(xsdres.errorStr);
@@ -136,7 +108,7 @@ freeSchema(ErlNifEnv *env, void *res) {
 
 #ifdef ERL_NIF_DIRTY_SCHEDULER_SUPPORT 
 static ErlNifFunc funcs[] = {
-	    {"validate", 2, validate, ERL_NIF_DIRTY_JOB_CPU_BOUND},
+	    {"validate", 2, vValidate, ERL_NIF_DIRTY_JOB_CPU_BOUND},
 		{"load_schema", 1, loadSchema, ERL_NIF_DIRTY_JOB_IO_BOUND}
 		};
 #else
@@ -148,7 +120,7 @@ static ErlNifFunc funcs[] = {
 
 static int
 load(ErlNifEnv *env, void **priv, ERL_NIF_TERM info) {
-	init();
+	vLibxmlInit();
 	int flags = ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER;
 	XMLSCHEMA_TYPE = enif_open_resource_type(env, NULL, "xsd_schema_resource", freeSchema, flags, NULL);
 	printf("Nif info: load\n");
@@ -163,14 +135,14 @@ unload(ErlNifEnv *env, void *priv) {
 static int
 reload(ErlNifEnv *env, void **priv, ERL_NIF_TERM info) {
 	printf("Nif info: reload\n");
-	cleanup();
+	vLibxmlCleanup();
 	return(load(env, priv, info));
 }
 
 static int
 upgrade(ErlNifEnv *env, void **priv, void **old_priv, ERL_NIF_TERM info) {
 	printf("Nif info: upgrade\n");
-	cleanup();
+	vLibxmlCleanup();
 	return load(env, priv, info);
 }
 
