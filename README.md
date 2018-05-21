@@ -23,6 +23,10 @@ def deps do
 end
 ```
 
+Currently I recommend updating the package quite frequently as I'm still in the process of fixing things:
+```
+  mix deps.update nif_xsd_validate
+```
 ## Usage
 
 Initialize the schema agent in the application module or manually.
