@@ -1,12 +1,16 @@
 defmodule NifXsd do
   require Logger
+  
+  @typedoc "The opaque resource type that wraps an xmlSchemaPtr."
+  @opaque resource :: any()
+
   @on_load :load_nifs
   
     @doc false
     def load_nifs do
-      case :erlang.load_nif(Path.join(:code.priv_dir(:nif_xsd_validate), "nif_xsd_validate"), 0) do
-        {:error, {_, error_text}} -> Logger.error "NIF load_nif failed: #{error_text}"
-        :ok -> Logger.info "NIF load_nif successful"
+      case :erlang.load_nif(String.to_charlist(Path.join(:code.priv_dir(:nif_xsd_validate), "nif_xsd_validate")), 0) do
+        :ok -> Logger.info "NIF load successful"
+        {:error, {_, error_text}} -> Logger.error "NIF load failed: #{error_text}"
       end
     end
 
@@ -16,7 +20,7 @@ defmodule NifXsd do
     ## Example
         NifXsd.validate(NifXsd.Schema.get(:someSchemaKey1), "<xml></xml>")
     """ 
-    @spec validate(any(), String.t) :: :ok|{:error, [String.t]}
+    @spec validate(resource, String.t) :: :ok|{:error, [String.t]}
     def validate(_resource, _xml) do
       raise "NIF validate/2 not implemented, load_nif probably failed"
     end

@@ -1,5 +1,8 @@
 defmodule NifXsd.Schema do  
 
+    @typedoc "The opaque resource type that wraps an xmlSchemaPtr."
+    @opaque resource :: any()
+
     @doc """
     Starts the agent for the schema map with an empty map.
     """ 
@@ -44,7 +47,7 @@ defmodule NifXsd.Schema do
     @doc """
     Returns a resource(xmlSchemaPtr) by its key, see `NifXsd.validate/2`.
     """
-    @spec get(atom()) :: any()    
+    @spec get(atom()) :: resource
     def get(key) do  
         Agent.get(__MODULE__, &Map.get(&1, key))  
     end  

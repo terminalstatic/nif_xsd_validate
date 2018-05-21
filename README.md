@@ -26,6 +26,7 @@ end
 Currently I recommend updating the package quite frequently as I'm still in the process of fixing things:
 ```
   mix deps.update nif_xsd_validate
+  mix deps.compile nif_xsd_validate
 ```
 ## Usage
 
