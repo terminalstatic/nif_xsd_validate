@@ -2,7 +2,7 @@ defmodule NifXsd do
   require Logger
   
   @typedoc "The opaque resource type that wraps an xmlSchemaPtr."
-  @opaque resource :: any()
+  @type resource :: any()
 
   @on_load :load_nifs
   

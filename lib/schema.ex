@@ -1,7 +1,7 @@
 defmodule NifXsd.Schema do  
 
     @typedoc "The opaque resource type that wraps an xmlSchemaPtr."
-    @opaque resource :: any()
+    @type resource :: any()
 
     @doc """
     Starts the agent for the schema map with an empty map.
