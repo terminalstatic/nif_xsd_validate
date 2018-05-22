@@ -22,8 +22,6 @@ def deps do
   ]
 end
 ```
-
-<<<<<<< HEAD
 Get the dependencies:
 ```
 mix deps.get
@@ -32,7 +30,6 @@ mix deps.get
 Currently I recommend updating the package quite frequently as I'm still in the process of fixing things:
 =======
 I currently recommend updating the package quite frequently:
->>>>>>> 74459b2f5807dfd273b2e96688a4c345d224c1dd
 ```
   mix deps.update nif_xsd_validate
   mix deps.compile nif_xsd_validate
