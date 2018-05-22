@@ -18,8 +18,9 @@ priv/vlibxml.o: c_source/vlibxml.c c_source/vlibxml.h
 	@$(CC) $(CFLAGS) -c -o $@ $< 
 
 priv/libxml2/lib/libxml2.a:
-	rm -rf c_build
-	mkdir -p c_build
+	@mkdir -p priv
+	@rm -rf c_build
+	@mkdir -p c_build
 	curl -L ftp://xmlsoft.org/libxml2/LATEST_LIBXML2 -o ./c_build/LATEST_LIBXML2.tar.gz 
 	tar -xf c_build/LATEST_LIBXML2.tar.gz -C ./c_build/
 	cd ./c_build/libxml2* \
@@ -31,6 +32,4 @@ priv/libxml2/lib/libxml2.a:
 	rm -rf priv/libxml2/include
 	rm -rf priv/libxml2/share
 clean:
-	rm -f priv/*.so
-	@rm -rf c_build
-	@rm -rf priv/libxml2
+	@rm -rf priv
