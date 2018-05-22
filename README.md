@@ -1,12 +1,10 @@
 # NifXsdValidate
-
 An elixir package for validating xml content against xsd, based on libxml2.
 It is basically meant to preload xsd schemata from given urls and use those throughout the lifetime of an application.
 This is quite an early version, right now the validation returns the status and a list of strings, this might be subject to change in the future.
 Generally changes to the api might still happen.
 
 ## Installation
-
 Although it would be probably possible to make this work it won't currently compile for windows.
 
 Prerequisites for building:
@@ -27,18 +25,14 @@ Get the dependencies:
 mix deps.get
 ```
 
-Currently I recommend updating the package quite frequently as I'm still in the process of fixing things:
-=======
 I currently recommend updating the package quite frequently:
 ```
   mix deps.update nif_xsd_validate
   mix deps.compile nif_xsd_validate
 ```
 ## Usage
-
 Initialize the schema agent in the application module or manually.
 Schemata (Libxml2 xmlSchemaPtrs) are stored in a map and identified by a key.
-
 ```elixir
 NifXsd.Schema.start_link(%{someSchemaKey1: "url://to/schema1"})
 NifXsd.validate(NifXsd.Schema.get(:someSchemaKey1), "<xml></xml>")
