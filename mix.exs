@@ -7,7 +7,7 @@ defmodule NifXsdValidate.MixProject do
     [
       app: :nif_xsd_validate,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: "~> 1.6",
       package: [
         maintainers: [],
         licenses: ["terminalstatic"],
