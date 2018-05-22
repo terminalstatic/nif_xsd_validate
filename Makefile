@@ -32,4 +32,7 @@ priv/libxml2/lib/libxml2.a:
 	rm -rf priv/libxml2/include
 	rm -rf priv/libxml2/share
 clean:
-	@rm -rf priv
+	@rm -rf priv/nif_xsd_validate.so.dSYM
+	@rm -f priv/*.so
+	@rm -rf c_build
+	@rm -rf priv/libxml2
