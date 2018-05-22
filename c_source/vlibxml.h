@@ -48,4 +48,4 @@ void vFreeErrArray(vErrArray *errArr);
 struct vXsdParserResult vParseUrlSchema(const char *url, const short int options);
 vErrArray *vValidateBuf(const void *xmlSource, const int xmlSourceLen, const short int xmlParserOptions, const xmlSchemaPtr schema);
 
-#endif^
+#endif
