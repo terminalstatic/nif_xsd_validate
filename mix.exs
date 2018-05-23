@@ -54,9 +54,18 @@ defmodule Mix.Tasks.Compile.NifXsdValidate do
       IO.warn("Windows is not supported.")
       exit(1)
     else
-    {_, errcode} = System.cmd("make", [], into: IO.stream(:stdio, :line))
-      if errcode != 0 do
-        Mix.raise("Mix task failed")
+      if File.exists?("./deps/nif_xsd_validate") do
+         File.cd!("./deps/nif_xsd_validate", fn ->
+            {_, errcode} = System.cmd("make", [], into: IO.stream(:stdio, :line))
+            if errcode != 0 do
+               Mix.raise("Mix task failed")
+            end
+         end)
+      else
+         {_, errcode} = System.cmd("make", [], into: IO.stream(:stdio, :line))
+         if errcode != 0 do
+            Mix.raise("Mix task failed")
+         end
       end
     end
     :ok 
