@@ -22,10 +22,10 @@ defmodule NifXsdValidate.MixProject do
           "c_source"
         ]
       ],
-      compilers: [:nifXsdValidate] ++ Mix.compilers,
+      compilers: [:nifXsdValidate] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      #ExDoc
+      # ExDoc
       name: "NifXsdValidate",
       source_url: "https://github.com/terminalstatic/nif_xsd_validate"
     ]
@@ -48,26 +48,35 @@ defmodule NifXsdValidate.MixProject do
     ]
   end
 end
+
 defmodule Mix.Tasks.Compile.NifXsdValidate do
   def run(_args) do
-    if match? {:win32, _}, :os.type do
+    if match?({:win32, _}, :os.type()) do
       IO.warn("Windows is not supported.")
       exit(1)
     else
       if File.exists?("./deps/nif_xsd_validate") do
-         File.cd!("./deps/nif_xsd_validate", fn ->
-            {_, errcode} = System.cmd("make", [], into: IO.stream(:stdio, :line))
-            if errcode != 0 do
-               Mix.raise("Mix task failed")
-            end
-         end)
-      else
-         {_, errcode} = System.cmd("make", [], into: IO.stream(:stdio, :line))
-         if errcode != 0 do
+        File.cd!("./deps/nif_xsd_validate", fn ->
+          {_, errcode} = System.cmd("make", [], into: IO.stream(:stdio, :line))
+
+          if errcode != 0 do
             Mix.raise("Mix task failed")
-         end
+
+            if Mix.env() == :prod do
+              IO.puts("Applying :prod build hack")
+              ('cp -rf ./priv ' ++ :code.lib_dir(:nif_xsd_validate)) |> :os.cmd() |> IO.puts()
+            end
+          end
+        end)
+      else
+        {_, errcode} = System.cmd("make", [], into: IO.stream(:stdio, :line))
+
+        if errcode != 0 do
+          Mix.raise("Mix task failed")
+        end
       end
     end
-    :ok 
+
+    :ok
   end
 end
