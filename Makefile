@@ -1,6 +1,6 @@
 CC = gcc
 ERLANG_PATH=$(shell erl -eval 'io:format("~s", [lists:concat([code:root_dir(), "/erts-", erlang:system_info(version), "/include"])])' -s init stop -noshell)
-CFLAGS=-fPIC -I$(ERLANG_PATH) -Ipriv/libxml2/include/libxml2 -std=c99 -O2 -Wall -pedantic -g  $(shell pkg-config --cflags libxml-2.0)
+CFLAGS=-fPIC -I$(ERLANG_PATH) -Ipriv/libxml2/include/libxml2 -Lpriv/libxml2/lib/ -std=c99 -O2 -Wall -pedantic -g
 
 ifeq ($(shell uname),Darwin)
 	LDFLAGS += -dynamiclib -undefined dynamic_lookup
@@ -10,8 +10,10 @@ endif
 
 priv/nif_xsd_validate.so: c_source/nif_xsd_validate.c priv/libxml2/lib/libxml2.a priv/vlibxml.o
 	@mkdir -p priv
-	@$(CC) $(CFLAGS) -shared $(LDFLAGS) -o $@ $+ $(shell pkg-config --libs libxml-2.0)
+	@$(CC) $(CFLAGS) -shared $(LDFLAGS) -o $@ $^
 	@rm -f priv/vlibxml.o
+	@rm -rf priv/libxml2/share
+	@rm -rf priv/libxml2/bin
 
 priv/vlibxml.o: c_source/vlibxml.c c_source/vlibxml.h
 	@mkdir -p priv
@@ -28,9 +30,7 @@ priv/libxml2/lib/libxml2.a:
 		&& make \
 		&& make install
 	rm -rf c_build
-	rm -rf priv/libxml2/bin
-	rm -rf priv/libxml2/include
-	rm -rf priv/libxml2/share
+
 clean:
 	@rm -rf priv/nif_xsd_validate.so.dSYM
 	@rm -f priv/*.so
