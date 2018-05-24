@@ -55,26 +55,24 @@ defmodule Mix.Tasks.Compile.NifXsdValidate do
       IO.warn("Windows is not supported.")
       exit(1)
     else
-      if File.exists?("./deps/nif_xsd_validate") do
-        File.cd!("./deps/nif_xsd_validate", fn ->
-          {_, errcode} = System.cmd("make", [], into: IO.stream(:stdio, :line))
+      {_, errcode} = System.cmd("make", [], into: IO.stream(:stdio, :line))
 
-          if errcode != 0 do
-            Mix.raise("Mix task failed")
-
-            if Mix.env() == :prod do
-              IO.puts("Applying :prod build hack")
-              ('cp -rf ./priv ' ++ :code.lib_dir(:nif_xsd_validate)) |> :os.cmd() |> IO.puts()
-            end
-          end
-        end)
-      else
-        {_, errcode} = System.cmd("make", [], into: IO.stream(:stdio, :line))
-
-        if errcode != 0 do
-          Mix.raise("Mix task failed")
-        end
+      if errcode != 0 do
+        Mix.raise("Mix task failed")
       end
+
+      if Mix.env() == :prod do
+        IO.puts("Applying :prod build hack")
+        basename = Path.basename(Mix.Project.app_path())
+
+        ('cp -rf ' ++
+           String.to_charlist(
+             Path.join(Mix.Project.deps_path(), [basename, "/", "priv"]) <>
+               " " <> Mix.Project.app_path()
+           ))
+        |> :os.cmd()
+      end
+
     end
 
     :ok
