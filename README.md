@@ -57,10 +57,10 @@ defmodule ExamplePlug.XsdValidate do
     def init(default), do: default
   
     def call(conn, _) do
-        {:ok, body, _} = Plug.Conn.read_body(conn)    
+        {:ok, body, conn} = Plug.Conn.read_body(conn)    
         
         case NifXsd.validate(NifXsd.Schema.get(:schema), body) do
-            :ok -> assign(conn, :xml_body, body)
+            :ok -> conn |> assign(:xml_body, body)
             {:error, reason} -> 
             reason = 
             "<Errors>" 
