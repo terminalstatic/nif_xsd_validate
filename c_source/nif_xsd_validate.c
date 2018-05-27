@@ -32,7 +32,6 @@ validate(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 	vErrArray *errs = vValidateBuf(xmlStr,xmlSize, P_ERR_VERBOSE, *schemaRes);
 	free(xmlStr);
 
-	// Array result
 	ERL_NIF_TERM erlErrs[errs->len];
 	for (int i=0;i<errs->len;i++) {
 		chopCRLF(errs->data[i].message);
@@ -85,7 +84,6 @@ loadSchema(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 		
 		result = enif_make_tuple2(env, enif_make_atom(env, "error"), enif_make_binary(env, &errStr));
 	} else {
-		//xsdres.schemaPtr->preserve = 12;
 		xmlSchemaPtr *schemaRes = enif_alloc_resource(XMLSCHEMA_TYPE, sizeof(xmlSchemaPtr *));
 		memcpy((void *) schemaRes, (void *) &xsdres.schemaPtr, sizeof(xmlSchemaPtr *));
 		
@@ -100,7 +98,6 @@ loadSchema(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 
 void 
 freeSchema(ErlNifEnv *env, void *res) {
-	//printf("IntGC: %d\n", (*s)->preserve);
 	xmlSchemaPtr *xsdres = res;
 	xmlSchemaFree(*xsdres);
 	printf("Schema garbage collected");
@@ -123,25 +120,25 @@ load(ErlNifEnv *env, void **priv, ERL_NIF_TERM info) {
 	vLibxmlInit();
 	int flags = ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER;
 	XMLSCHEMA_TYPE = enif_open_resource_type(env, NULL, "xsd_schema_resource", freeSchema, flags, NULL);
-	printf("Nif info: load\n");
+	printf("Info: nif_xsd_validate load\n");
 	return(0);
 }
 
 static void
 unload(ErlNifEnv *env, void *priv) {
-	printf("Nif info: unload\n");
+	printf("Info: nif_xsd_validate unload\n");
 }
 
 static int
 reload(ErlNifEnv *env, void **priv, ERL_NIF_TERM info) {
-	printf("Nif info: reload\n");
+	printf("Info: nif_xsd_validate reload\n");
 	vLibxmlCleanup();
 	return(load(env, priv, info));
 }
 
 static int
 upgrade(ErlNifEnv *env, void **priv, void **old_priv, ERL_NIF_TERM info) {
-	printf("Nif info: upgrade\n");
+	printf("Info: nif_xsd_validate upgrade\n");
 	vLibxmlCleanup();
 	return load(env, priv, info);
 }
@@ -156,4 +153,3 @@ static void chopPoint(char *str) {
 }
 
 ERL_NIF_INIT(Elixir.NifXsd, funcs, &load, &reload, &upgrade, &unload)
-
