@@ -180,7 +180,6 @@ static vErrArray *vValidate(const xmlDocPtr doc, const xmlSchemaPtr schema) {
 	errArr->cap=2;
 	struct vSimpleXmlError simpleError;
 	simpleError.message = calloc(P_ERR_INIT, sizeof(char));
-	simpleError.node = calloc(P_ERR_INIT, sizeof(char));
 	if (schema == NULL) {
 		simpleError.type = LIBXML2_ERROR;
 		strcpy(simpleError.message, "Xsd schema null pointer");
@@ -218,7 +217,6 @@ static vErrArray *vValidate(const xmlDocPtr doc, const xmlSchemaPtr schema) {
 			}
 		}
 	}
-	free(simpleError.node);
 	free(simpleError.message);
 	errno = errArr->len == NO_ERROR ? 0 : -1;
 	return errArr;
@@ -231,7 +229,6 @@ vErrArray *vValidateBuf(const void *xmlSource, const int xmlSourceLen, const sho
 	errArr->cap=2;
 	struct vSimpleXmlError simpleError;
 	simpleError.message = calloc(P_ERR_INIT, sizeof(char));
-	simpleError.node = calloc(P_ERR_INIT, sizeof(char));
 	struct vXmlParserResult parserResult = vParseDoc(xmlSource, xmlSourceLen, xmlParserOptions);
 	if (schema == NULL) {
 		simpleError.type = LIBXML2_ERROR;
@@ -250,7 +247,6 @@ vErrArray *vValidateBuf(const void *xmlSource, const int xmlSourceLen, const sho
 	}
 	else
 	{
-		free(simpleError.node);
 		free(simpleError.message);
 		free(errArr->data);
 		free(errArr);
