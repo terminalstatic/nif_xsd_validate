@@ -105,7 +105,7 @@ freeSchema(ErlNifEnv *env, void *res) {
 
 #ifdef ERL_NIF_DIRTY_SCHEDULER_SUPPORT 
 static ErlNifFunc funcs[] = {
-	    {"validate", 2, vValidate, ERL_NIF_DIRTY_JOB_CPU_BOUND},
+	    {"validate", 2, validate, ERL_NIF_DIRTY_JOB_CPU_BOUND},
 		{"load_schema", 1, loadSchema, ERL_NIF_DIRTY_JOB_IO_BOUND}
 		};
 #else

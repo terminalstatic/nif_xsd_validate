@@ -147,12 +147,14 @@ static struct vXmlParserResult vParseDoc(const void *xmlSource, const int xmlSou
 			} else {
 				xmlSetGenericErrorFunc(NULL, noOutputCallback);
 			}
+			xmlCtxtUseOptions(xmlParserCtxt, XML_PARSE_IGNORE_ENC);
 			doc = xmlParseMemory(xmlSource, xmlSourceLen);
 			xmlFreeParserCtxt(xmlParserCtxt);
 			if (doc == NULL) {
 				err = true;
 				if (options & P_ERR_VERBOSE) {
 					char *tmp = malloc(strlen(ectx.errBuf) + 1);
+					printf("%zd\n", strlen(ectx.errBuf));
 					memcpy(tmp, ectx.errBuf, strlen(ectx.errBuf) + 1);
 					free(ectx.errBuf);
 					ectx.errBuf = tmp;
