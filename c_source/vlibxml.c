@@ -153,8 +153,8 @@ static struct vXmlParserResult vParseDoc(const void *xmlSource, const int xmlSou
 			if (doc == NULL) {
 				err = true;
 				if (options & P_ERR_VERBOSE) {
-					char *tmp = malloc(strlen(ectx.errBuf) + 1);					
-					memcpy(tmp, ectx.errBuf, strlen(ectx.errBuf) + 1);
+					char *tmp = calloc(strlen(ectx.errBuf) + 1, sizeof(*tmp));					
+					memcpy(tmp, ectx.errBuf, strlen(ectx.errBuf));
 					free(ectx.errBuf);
 					ectx.errBuf = tmp;
 				} else {
@@ -163,9 +163,10 @@ static struct vXmlParserResult vParseDoc(const void *xmlSource, const int xmlSou
 			}
 		}
 	}
-	errBuf=malloc(strlen(ectx.errBuf)+1);
-	memcpy(errBuf,  ectx.errBuf, strlen(ectx.errBuf)+1);
+	errBuf=calloc(strlen(ectx.errBuf) + 1, sizeof(char));
+	memcpy(errBuf,  ectx.errBuf, strlen(ectx.errBuf));	
 	free(ectx.errBuf);
+
 	parserResult.docPtr=doc;
 	parserResult.errorStr=errBuf;
 	errno = err ? -1 : 0;
@@ -241,7 +242,9 @@ vErrArray *vValidateBuf(const void *xmlSource, const int xmlSourceLen, const sho
 	}
 	else if (parserResult.docPtr == NULL) {
 		simpleError.type = XML_PARSER_ERROR;
-		strcpy(simpleError.message, parserResult.errorStr);
+		free(simpleError.message);
+		simpleError.message = calloc(P_ERR_INIT, strlen(parserResult.errorStr) + 1);
+		memcpy(simpleError.message, parserResult.errorStr, strlen(parserResult.errorStr));
 		errArr->data[errArr->len] = simpleError;
 		errArr->len++;
 	}

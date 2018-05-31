@@ -3,7 +3,7 @@
 
 #include <libxml/xmlschemastypes.h>
 
-#define P_ERR_INIT 2048
+#define P_ERR_INIT 1024
 #define P_ERR_DEFAULT 1
 #define P_ERR_VERBOSE 2
 
