@@ -1,19 +1,19 @@
 defmodule NifXsdValidate.MixProject do
   use Mix.Project
 
-  @version "0.0.10"
-
   def project do
     [
       app: :nif_xsd_validate,
-      version: @version,
+      version: "0.0.10",
       elixir: "~> 1.6",
       package: [
-        maintainers: [],
-        licenses: ["terminalstatic"],
+        maintainers: ["terminalstatic"],
+        licenses: ["MIT"],
+	description: "Xsd schema validation for elixir based on libxml2",
         links: %{"Github" => "https://github.com/terminalstatic/nif_xsd_validate"},
         files: [
           "mix.exs",
+          "LICENSE", 
           "Makefile",
           "README.md",
           "config",
